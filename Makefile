@@ -1,2 +1,2 @@
 run:
-	@cd ./api && ./run.sh
+	@cd ./api && ./serve
