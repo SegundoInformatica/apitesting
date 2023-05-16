@@ -4,6 +4,7 @@ use reqwest::{Client, Result};
 struct NewRequest {
     endpoint: &'static str,
     params: HashMap<&'static str, &'static str>,
+    client: Client,
 }
 
 impl NewRequest {
@@ -11,18 +12,21 @@ impl NewRequest {
         let mut params: HashMap<&str, &str> = HashMap::new();
         params.insert("name", form_name);
 
+        let client = Client::new();
+
         return Self {
             endpoint,
             params,
+            client,
         };
     }
 
     pub async fn post(&self) -> Result<String> {
-        return Client::new().post(self.endpoint).form(&self.params).send().await?.text().await;
+        return self.client.post(self.endpoint).form(&self.params).send().await?.text().await;
     }
 
     pub async fn get(&self) -> Result<String> {
-        return Client::new().get(self.endpoint).form(&self.params).send().await?.text().await;
+        return self.client.get(self.endpoint).form(&self.params).send().await?.text().await;
     }
 }
 
