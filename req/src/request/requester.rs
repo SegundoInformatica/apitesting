@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use reqwest::{Client, Result};
 
+use super::curl::CURL;
+
 pub struct Request {
     endpoint: &'static str,
     params: HashMap<&'static str, &'static str>,
@@ -30,8 +32,16 @@ impl Request {
             return self.client.post(self.endpoint).form(&self.params).send().await?.text().await;
         }
 
-        // TODO: Make cURL act
-        return Ok(String::new());
+        let mut data: Vec<String> = Vec::new();
+
+        for (k, v) in self.params.iter() {
+            data.push(format!("{}={}", k, v));
+        }
+
+        match CURL::new(self.endpoint.to_string(), data.join("&")).post() {
+            Ok(o) => return Ok(o),
+            Err(_) => return Ok(String::new()),
+        }
     }
 
     pub async fn get(&self) -> Result<String> {
@@ -39,8 +49,16 @@ impl Request {
             return self.client.get(self.endpoint).form(&self.params).send().await?.text().await;
         }
 
-        // TODO: Make cURL act
-        return Ok(String::new());
+        let mut data: Vec<String> = Vec::new();
+
+        for (k, v) in self.params.iter() {
+            data.push(format!("{}={}", k, v));
+        }
+
+        match CURL::new(self.endpoint.to_string(), data.join("&")).get() {
+            Ok(o) => return Ok(o),
+            Err(_) => return Ok(String::new()),
+        }
     }
 }
 
