@@ -1,4 +1,6 @@
 mod request;
+mod logger;
+
 use request::requester;
 
 #[tokio::main]
