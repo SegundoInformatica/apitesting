@@ -1,10 +1,10 @@
-mod requester;
-use requester::Request;
+mod request;
+use request::requester;
 
 #[tokio::main]
 async fn main() {
-    let tobias: Request = Request::new("http://127.0.0.1:5000", "Tobias");
-    let null: Request = Request::new("http://127.0.0.1:5000", "");
+    let tobias: requester::Request = requester::Request::new("http://127.0.0.1:5000", "Tobias");
+    let null: requester::Request = requester::Request::new("http://127.0.0.1:5000", "");
 
     println!("POST TOBIAS: {}", tobias.post().await.expect("Could not fetch text from request").trim());
     println!("POST NULL:   {}", null.post().await.expect("Could not fetch text from request").trim());
