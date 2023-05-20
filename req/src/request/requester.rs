@@ -5,6 +5,7 @@ pub struct Request {
     endpoint: &'static str,
     params: HashMap<&'static str, &'static str>,
     client: Client,
+    prefer_curl: bool,
 }
 
 impl Request {
@@ -16,15 +17,30 @@ impl Request {
             endpoint,
             params,
             client: Client::new(),
+            prefer_curl: false,
         };
     }
 
+    pub fn use_curl(&mut self) -> () {
+        self.prefer_curl = true;
+    }
+
     pub async fn post(&self) -> Result<String> {
-        return self.client.post(self.endpoint).form(&self.params).send().await?.text().await;
+        if !self.prefer_curl {
+            return self.client.post(self.endpoint).form(&self.params).send().await?.text().await;
+        }
+
+        // TODO: Make cURL act
+        return Ok(String::new());
     }
 
     pub async fn get(&self) -> Result<String> {
-        return self.client.get(self.endpoint).form(&self.params).send().await?.text().await;
+        if !self.prefer_curl {
+            return self.client.get(self.endpoint).form(&self.params).send().await?.text().await;
+        }
+
+        // TODO: Make cURL act
+        return Ok(String::new());
     }
 }
 
