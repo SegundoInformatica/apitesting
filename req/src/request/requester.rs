@@ -6,6 +6,7 @@ use super::curl::CURL;
 pub struct Request {
     endpoint: &'static str,
     params: HashMap<&'static str, &'static str>,
+    curl: CURL,
     client: Client,
     prefer_curl: bool,
 }
@@ -15,9 +16,12 @@ impl Request {
         let mut params: HashMap<&str, &str> = HashMap::new();
         params.insert("name", form_name);
 
+        let data = params.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<String>>().join("&");
+
         return Self {
             endpoint,
             params,
+            curl: CURL::new(endpoint.to_string(), data),
             client: Client::new(),
             prefer_curl: false,
         };
@@ -27,35 +31,23 @@ impl Request {
         self.prefer_curl = true;
     }
 
-    pub async fn post(&self) -> Result<String> {
+    pub async fn post(&mut self) -> Result<String> {
         if !self.prefer_curl {
             return self.client.post(self.endpoint).form(&self.params).send().await?.text().await;
         }
 
-        let mut data: Vec<String> = Vec::new();
-
-        for (k, v) in self.params.iter() {
-            data.push(format!("{}={}", k, v));
-        }
-
-        match CURL::new(self.endpoint.to_string(), data.join("&")).post() {
-            Ok(o) => return Ok(o),
+        match self.curl.post() {
+            Ok(o) => return Ok(o.to_string()),
             Err(_) => return Ok(String::new()),
         }
     }
 
-    pub async fn get(&self) -> Result<String> {
+    pub async fn get(&mut self) -> Result<String> {
         if !self.prefer_curl {
             return self.client.get(self.endpoint).form(&self.params).send().await?.text().await;
         }
 
-        let mut data: Vec<String> = Vec::new();
-
-        for (k, v) in self.params.iter() {
-            data.push(format!("{}={}", k, v));
-        }
-
-        match CURL::new(self.endpoint.to_string(), data.join("&")).get() {
+        match self.curl.get() {
             Ok(o) => return Ok(o),
             Err(_) => return Ok(String::new()),
         }

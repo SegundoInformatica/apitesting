@@ -6,7 +6,7 @@ pub struct CURL {
     curl_command: Command,
 }
 
-impl CURL{
+impl CURL {
     pub fn new(endpoint: String, data: String) -> Self {
         let command = Command::new("curl");
 
