@@ -12,6 +12,8 @@ pub enum LogType {
     Error,
 }
 
+// NOTE: cloning in the long run is bad imo
+#[derive(Clone)]
 pub struct Logger {
     log_dir: Option<String>,
     debug: bool,
@@ -23,7 +25,12 @@ impl Logger {
     }
 
     pub fn set_debug(&mut self, to: Option<bool>) {
-        self.debug = to.unwrap_or(!self.debug);
+        if to.is_none() {
+            self.debug = false;
+            return;
+        }
+
+        self.debug = to.unwrap();
     }
 
     pub fn set_log_dir(&mut self, path: &str) {
