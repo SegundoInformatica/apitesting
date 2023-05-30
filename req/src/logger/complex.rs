@@ -12,16 +12,18 @@ pub enum LogType {
     Error,
 }
 
-// NOTE: cloning in the long run is bad imo
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct Logger {
-    log_dir: Option<String>,
+    log_dir: &'static str,
     debug: bool,
 }
 
 impl Logger {
     pub fn new() -> Self {
-        return Self { log_dir: None, debug: false };
+        return Self {
+            log_dir: "",
+            debug: false,
+        };
     }
 
     pub fn set_debug(&mut self, to: Option<bool>) {
@@ -33,9 +35,9 @@ impl Logger {
         self.debug = to.unwrap();
     }
 
-    pub fn set_log_dir(&mut self, path: &str) {
+    pub fn set_log_dir(&mut self, path: &'static str) {
         // TODO: Check for path
-        self.log_dir = Some(path.to_string());
+        self.log_dir = path;
     }
 
     pub fn log(self, log_type: LogType, text: String) {

@@ -6,14 +6,11 @@ use logger::complex::Logger;
 
 #[tokio::main]
 async fn main() {
-    let mut logger_tobias = Logger::new();
-    logger_tobias.set_debug(Some(true));
+    let mut logger = Logger::new();
+    logger.set_debug(Some(true));
 
-    let mut logger_null = Logger::new();
-    logger_null.set_debug(Some(false));
-
-    let mut tobias: requester::Request = requester::Request::new("http://127.0.0.1:5000", Some(logger_tobias), "Tobias");
-    let mut null: requester::Request = requester::Request::new("http://127.0.0.1:5000", Some(logger_null), "");
+    let mut tobias: requester::Request = requester::Request::new("http://127.0.0.1:5000", logger, "Tobias");
+    let mut null: requester::Request = requester::Request::new("http://127.0.0.1:5000", logger, "");
 
     println!("POST TOBIAS:      {}", tobias.post().await.expect("Could not fetch text from request").trim());
     println!("POST NULL:        {}", null.post().await.expect("Could not fetch text from request").trim());
